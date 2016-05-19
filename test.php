@@ -6,6 +6,7 @@
       #map { height: 90%; width: 100%; }
 	  #route {width: 100%; background: white;}
     </style>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
   </head>
   <body>
   <div id="container">
@@ -13,7 +14,6 @@
 	<div id="route"></div>
   </div>
     <script type="text/javascript">
-
 function initMap() {
 	directionsDisplay=null;
 	var cargado=false;
@@ -40,7 +40,15 @@ function initMap() {
 					position: pos_act,
 					map: map,
 					title: "Posicion actual",
-					animation: google.maps.Animation.DROP,
+					icon: {
+						path: google.maps.SymbolPath.CIRCLE,
+						scale: 9,
+						strokeColor: '#FFFFFF',
+						strokeWeight: 3,
+						fillColor: '#00BFFF',
+						fillOpacity: 1
+					},
+					animation: google.maps.Animation.DROP
 					
 				});
 		map.setCenter(pos_act);
@@ -55,11 +63,19 @@ function initMap() {
                         'Error: The Geolocation service failed.' :
                         'Error: Your browser doesn\'t support geolocation.');
 	}
+	
+	initMarkers()
+	
+}//end function initMap.
+
+function initMarkers(){
 	<?php
+		$usuario="admin";
+		
 		require('conecta.php');
 
 		$con=Conectar();
-		$sql="SELECT longitud,latitud,nombre,id FROM data LIMIT 30";
+		$sql="SELECT longitud,latitud,nombre,id,cant_bicis FROM data LIMIT 30";
 
 		$res=mysqli_query($con,$sql);
 		$flag=false;
@@ -73,10 +89,10 @@ function initMap() {
 				$flag=true;
 			}//end if php
 		?>
-			
+			myposition_<?php echo $registro[3];?> = null;
 			myposition_<?php echo $registro[3];?> = new google.maps.LatLng(<?php echo $registro[0]?>,<?php echo $registro[1]?>);
 			
-			
+			marker_<?php echo $registro[3];?>=null;
 			marker_<?php echo $registro[3];?> = new google.maps.Marker({
 				position: myposition_<?php echo $registro[3];?>,
 				map: map,
@@ -90,9 +106,11 @@ function initMap() {
 				}
 				var content_marker='<div>'+
 									'<p><?php echo $registro[2]?></p>'+
+									'<p>Bicicletas disponibles: <?php echo $registro[4]?></p>'+
 								'</div>'+
 								'<div>'+
 									'<input type="button" onclick="javascript:crearRuta(myposition_<?php echo $registro[3];?>)" value="Crear ruta">'+
+									'<input type="button" onclick="javascript:reservar(<?php echo $registro[3];?>)" value="Reservar">'+
 								'</div>';
 				infowindow.setContent(content_marker);
 				infowindow.open(map,marker_<?php echo $registro[3];?>);
@@ -100,7 +118,7 @@ function initMap() {
 		<?php
 		}//end while php
 		?>
-}//end function initMap.
+	}
 	
 function crearRuta(m){
 	if(directionsDisplay != null) {
@@ -127,6 +145,23 @@ function crearRuta(m){
 		}
 	});
 }//end function crearRuta
+
+function reservar(id){
+	<?php
+		//El error esta aqui.
+		/*require('conecta.php');*/
+		$id=1;
+		$sql1="UPDATE data SET cant_bicis=cant_bicis-1 WHERE id=$id";
+		$sql2="UPDATE users SET reserva=1 WHERE user=$usuario";
+		$respuesta1= mysqli_query($con,$sql1);
+		if($respuesta1==null){
+			?>
+			alert("Reserva hecha correctamente.");
+			<?php
+		}
+		?>
+	initMap();
+}
 		</script>
     <script async defer
       src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDRnFCFj6P12Y5sYbMTA9-3l3j7h1T2wjg&callback=initMap">

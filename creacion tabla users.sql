@@ -1,0 +1,1 @@
+CREATE TABLE `bicis`.`users` ( `usuario` TEXT NOT NULL , `contrasena` TEXT NOT NULL , `reserva` BOOLEAN NOT NULL , `email` TEXT NOT NULL ) ENGINE = InnoDB;
