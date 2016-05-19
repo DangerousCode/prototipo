@@ -10,6 +10,7 @@
   </head>
   <body>
   <div id="container">
+	<a href="logout.php"><p>Logout</p></a>
     <div id="map"></div>
 	<div id="route"></div>
   </div>

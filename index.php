@@ -1,44 +1,100 @@
-<html>
-	<head>
-
-		<!-- Include meta tag to ensure proper rendering and touch zooming -->
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-
-		<!-- Include jQuery Mobile stylesheets -->
-		<link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
-
-		<!-- Include the jQuery library -->
-		<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
-
-		<!-- Include the jQuery Mobile library -->
-		<script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
-
-	</head>
-	<body>
-		<div data-role="page">
-			<div data-role="header">
-				<h1>BiciMad</h1>
-			</div>
-			<div data-role="body">
-				<h3>Login</h3>
-				<form name="formulario">
-					<input type="text" id="user" placeholder="User"/>
-					<input type="password" id="pass" placeholder="Password"/>
-					<input type="submit" value="Login" onclick="validar()">
-				</form>
-				<a href="signup.php"><p>Clic aquí para registrarte</p></a>
-			</div>
-		</div>
-		
-		<script>
-			var user= document.getElementById("user").value;
-			var pass= document.getElementById("pass").value;
-			function validar(){
-				$.ajax({
-					url: "validar.php?user="+user+"&pass="+pass,
-					type: "post"
-				})
-			}
-		</script>
-	</body>
-</html>
+<?php 
+session_start(); 
+include_once "conecta.php"; 
+  
+function verificar_login($user,$password,&$result) {
+	$con=Conectar();
+    $sql = "SELECT * FROM users WHERE usuario = '$user' and contrasena = '$password'"; 
+    $rec = mysqli_query($con,$sql); 
+    $count = 0; 
+  
+    while($row = mysqli_fetch_object($rec)) 
+    { 
+        $count++; 
+        $result = $row; 
+    } 
+  
+    if($count == 1) 
+    { 
+        return 1; 
+    } 
+  
+    else 
+    { 
+        return 0; 
+    } 
+} 
+  
+if(!isset($_SESSION['userid'])) 
+{ 
+    if(isset($_POST['login'])) 
+    { 
+        if(verificar_login($_POST['user'],$_POST['password'],$result) == 1) 
+        { 
+            $_SESSION['userid'] = $result->idusuario; 
+            header("location:index.php"); 
+        } 
+        else 
+        { 
+            echo '<div class="error">Su usuario es incorrecto, intente nuevamente.</div>';
+        } 
+    } 
+?> 
+  
+<style type="text/css"> 
+*{ 
+    font-size: 14px; 
+} 
+body{ 
+background:#aaa; 
+} 
+form.login { 
+    background: none repeat scroll 0 0 #F1F1F1; 
+    border: 1px solid #DDDDDD; 
+    font-family: sans-serif; 
+    margin: 0 auto; 
+    padding: 20px; 
+    width: 278px; 
+    box-shadow:0px 0px 20px black; 
+    border-radius:10px;
+} 
+form.login div { 
+    margin-bottom: 15px; 
+    overflow: hidden; 
+	float: center;
+} 
+form.login div label { 
+    display: block; 
+    float: left; 
+    line-height: 25px; 
+} 
+form.login div input[type="text"], form.login div input[type="password"] { 
+    border: 1px solid #DCDCDC; 
+    float: right; 
+    padding: 4px; 
+} 
+form.login div input[type="submit"] { 
+    background: none repeat scroll 0 0 #DEDEDE; 
+    border: 1px solid #C6C6C6; 
+    float: right; 
+    font-weight: bold; 
+    padding: 4px 20px; 
+} 
+.error{ 
+    color: red; 
+    font-weight: bold; 
+    margin: 10px; 
+    text-align: center; 
+} 
+</style> 
+  
+<form action="" method="post" class="login"> 
+    <div><label>Username</label><input name="user" type="text" ></div> 
+    <div><label>Password</label><input name="password" type="password"></div> 
+    <div><input name="login" type="submit" value="login"></div> 
+</form> 
+<?php 
+} else { 
+    header("location:test.php"); 
+} 
+?>
