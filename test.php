@@ -35,6 +35,8 @@ function initMap() {
 		lat= position.coords.latitude,
 		lng= position.coords.longitude
 		
+		centro_mapa=new google.maps.LatLng(40.416894, -3.703526);
+		
 		pos_act=new google.maps.LatLng(lat,lng);
 			
 		var marker_pos_actual = new google.maps.Marker({
@@ -52,7 +54,7 @@ function initMap() {
 					animation: google.maps.Animation.DROP
 					
 				});
-		map.setCenter(pos_act);
+		map.setCenter(centro_mapa);
 		}, function() {
 			handleLocationError(true, infoWindow, map.getCenter());
 		});
@@ -71,7 +73,8 @@ function initMap() {
 
 function initMarkers(){
 	<?php
-		$usuario="admin";
+		session_start();
+		$usuario=$_SESSION["usuario"];
 		
 		require('conecta.php');
 
@@ -148,20 +151,29 @@ function crearRuta(m){
 }//end function crearRuta
 
 function reservar(id){
+	<?php 
+	if(!isset($_SESSION['reserva'])){
+	?>
+		$.ajax({
+			url: 'reservar.php',
+			type: 'POST',
+			data: {'id':id},
+			success: function (response) {
+				<?php $_SESSION["reserva"]=true; ?>
+				alert(response);
+			},
+			error: function(response){
+				alert(response);
+			}
+		})
+		location.reload();
 	<?php
-		//El error esta aqui.
-		/*require('conecta.php');*/
-		$id=1;
-		$sql1="UPDATE data SET cant_bicis=cant_bicis-1 WHERE id=$id";
-		$sql2="UPDATE users SET reserva=1 WHERE user=$usuario";
-		$respuesta1= mysqli_query($con,$sql1);
-		if($respuesta1==null){
-			?>
-			alert("Reserva hecha correctamente.");
-			<?php
-		}
-		?>
-	initMap();
+	}else{
+	?>
+		alert("Ya ha realizado una reserva.")
+	<?php
+	}
+	?>
 }
 		</script>
     <script async defer

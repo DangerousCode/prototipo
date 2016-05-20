@@ -30,7 +30,8 @@ if(!isset($_SESSION['userid']))
     if(isset($_POST['login'])) 
     { 
         if(verificar_login($_POST['user'],$_POST['password'],$result) == 1) 
-        { 
+        {
+			$_SESSION['usuario']= $result->usuario;
             $_SESSION['userid'] = $result->idusuario; 
             header("location:index.php"); 
         } 
@@ -61,7 +62,6 @@ form.login {
 form.login div { 
     margin-bottom: 15px; 
     overflow: hidden; 
-	float: center;
 } 
 form.login div label { 
     display: block; 
